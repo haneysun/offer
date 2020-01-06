@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.offer.dao.UserMapper">
+    <resultMap id="BaseResultMap" type="com.example.offer.entity.User" >
+        <result column="id" property="id" jdbcType="BIGINT" />
+        <result column="login_name" property="loginName" jdbcType="VARCHAR" />
+        <result column="login_pass" property="loginPass" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="tel" property="tel" jdbcType="VARCHAR" />
+        <result column="ip" property="ip" jdbcType="VARCHAR" />
+        <result column="add_date" property="addDate" jdbcType="TIMESTAMP" />
+        <result column="login_count" property="loginCount" jdbcType="INTEGER" />
+        <result column="login_date" property="loginDate" jdbcType="TIMESTAMP" />
+        <result column="lockup" property="lockup" jdbcType="INTEGER" />
+        <result column="val" property="val" jdbcType="VARCHAR" />
+        <result column="mid" property="mid" jdbcType="INTEGER" />
+        <result column="bumen" property="bumen" jdbcType="INTEGER" />
+        <result column="text" property="text" jdbcType="LONGVARCHAR" />
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="Base4ResultMap" type="com.example.offer.entity.User">
+        <id column="id" property="id" />
+        <result column="login_name" property="loginName" />
+        <result column="login_pass" property="loginPass" />
+        <result column="name" property="name" />
+        <result column="tel" property="tel" />
+        <result column="ip" property="ip" />
+        <result column="add_date" property="addDate" />
+        <result column="login_count" property="loginCount" />
+        <result column="login_date" property="loginDate" />
+        <result column="lockup" property="lockup" />
+        <result column="val" property="val" />
+        <result column="mid" property="mid" />
+        <result column="bumen" property="bumen" />
+        <result column="text" property="text" />
+        <result column="type" property="type" />
+        <result column="version" property="version" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, login_name, login_pass, name, tel, ip, add_date, login_count, login_date, lockup, val, mid, bumen, text, type, version
+    </sql>
+
+    <select id="loginfill" resultMap="BaseResultMap" parameterType="com.example.offer.entity.User">
+        select * from `user` where login_name = #{loginName } and login_pass = #{loginPass } and `lockup`="1"
+    </select>
+    <select id="findAction" resultMap="BaseResultMap" parameterType="com.example.offer.entity.User">
+        select * from `user` where 1=1
+        <if test="id!= null and id!= ''">
+            AND id = #{id }
+        </if>
+    </select>
+    <select id="getUserByName" resultMap="BaseResultMap" parameterType="string">
+        select * from `user` where login_name = #{loginname}
+    </select>
+    <select id="findUserAndRoles" resultType="java.util.Map" parameterType="com.example.offer.mv.UserSearch">
+        select
+        a.id "id",
+        a.login_name "login_name",
+        a.login_pass "login_pass",
+        a.name "name",
+        a.tel "tel",
+        a.add_date "add_date",
+        a.login_count "login_count",
+        a.login_date "logindate",
+        a.lockup "lockup",
+        a.val "val",
+        a.mid "mid",
+        a.text "text",
+        a.bumen "bumen",
+        b.name as "bumenName"
+        FROM `user` a left JOIN role b on a.bumen = b.id
+        <where>
+            <if test="name != null and name !='' ">
+                <trim prefix="(" suffix=")">
+                a.name LIKE CONCAT("%",#{name},"%") or
+                a.login_name LIKE CONCAT("%",#{name},"%")
+                </trim>
+            </if>
+            <if test="bumenname != null and bumenname !='' ">
+                and b.name like '%'||#{bumenname}||'%'
+            </if>
+        </where>
+        ORDER BY add_date DESC
+    </select>
+    <delete id="deleteUserById" parameterType="java.lang.Long" >
+        delete from `user`
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <update id="updateUser" parameterType="com.example.offer.entity.User">
+        UPDATE  `user` SET `name`=#{name},tel=#{tel}
+        <if test="loginPass != null and loginPass !='' ">
+            ,login_pass=#{loginPass}
+        </if>
+        <if test="lockup != null">
+            ,lockup=#{lockup}
+        </if>
+        <if test="bumen != null">
+            ,bumen=#{bumen}
+        </if>
+        <if test="val != null">
+            ,val=#{val}
+        </if>
+        WHERE id=#{id}
+    </update>
+    <update id="lockUser" parameterType="com.example.offer.entity.User">
+        UPDATE  `user` SET lockup=#{lockup} WHERE id=#{id}
+    </update>
+    <!--<update id="lockAgentUser" parameterType="com.example.auctionapi.entity.User">
+        UPDATE  `user` SET lockup=#{lockup} WHERE agent_id=#{agentId}
+    </update>-->
+    <!--<select id="findAgentUser" resultType="Long" parameterType="com.example.auctionapi.entity.User">
+        SELECT id FROM `user` WHERE agent_id=#{agentId} AND lockup=#{lockup}
+    </select>-->
+    <update id="updatePassword" parameterType="com.example.offer.entity.User">
+        UPDATE  `user` a SET a.login_pass=#{loginPass} WHERE id=#{id}
+    </update>
+
+    <!-- 根据用户roleId查询用户ID -->
+    <select id="findUserIdByRoleId" resultType="long">
+        select id from `user` where bumen =  #{id,jdbcType=BIGINT}
+    </select>
+    <update id="clearUserRoleByRoleId" parameterType="java.lang.Long">
+        UPDATE  `user` a SET a.bumen="" WHERE a.bumen=#{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectAllUser" resultMap="BaseResultMap">
+        SELECT * FROM `user` order by id;
+    </select>
+    <select id="queryLoginname" parameterType="com.example.offer.entity.User" resultType="java.lang.Integer">
+        SELECT count(*) FROM `user` WHERE login_name=#{loginName}
+    </select>
+    <select id="selectUidBySfid" resultMap="BaseResultMap">
+        select * FROM `user` WHERE sf_id = #{sfId};
+    </select>
+    <select id="getUserList" resultMap="BaseResultMap" parameterType="com.example.offer.entity.User">
+        SELECT *
+        FROM `user`
+        WHERE `tel` = #{tel}
+    </select>
+
+    <insert id="addUser" useGeneratedKeys="true" keyProperty="id" parameterType="com.example.offer.entity.User">
+        INSERT INTO `user` (
+        login_name,
+        login_pass,
+        name,
+        tel,
+        bumen,
+        mid,
+        `type`,
+        text
+        ) VALUES (
+        #{loginName},
+        #{loginPass},
+        #{name},
+        #{tel},
+        #{bumen},
+        #{mid},
+        #{type},
+        #{text}
+        )
+    </insert>
+
+    <select id="findUserList" resultMap="BaseResultMap" parameterType="com.example.offer.entity.User">
+        SELECT
+        id,
+        login_name
+        FROM `user`
+        WHERE mid = #{mid}
+        <if test="id != null and id !='' ">
+            AND id=#{id}
+        </if>
+    </select>
+
+    <resultMap id="UserListMap" type="Map">
+        <id column="id" property="id"/>
+        <result column="login_name" property="loginName"/>
+        <result column="name" property="name"/>
+        <result column="loginType" property="loginType"/>
+        <result column="lockup" property="lockup"/>
+    </resultMap>
+    <select id="findUserListMap" resultMap="UserListMap" parameterType="map">
+        SELECT
+        id,
+        login_name,
+        (SELECT r.name FROM role r WHERE r.id=bumen) loginType,
+        lockup
+        FROM `user`
+        WHERE mid = #{mid}
+        <if test="id != null and id !='' ">
+            AND id=#{id}
+        </if>
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        select * from user where id=#{id}
+    </select>
+</mapper>

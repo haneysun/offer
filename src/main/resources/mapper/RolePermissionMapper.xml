@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.offer.dao.RolePermissionMapper" >
+  <resultMap id="BaseResultMap" type="com.example.offer.entity.RolePermission" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <result column="pid" property="pid" jdbcType="INTEGER" />
+    <result column="rid" property="rid" jdbcType="INTEGER" />
+    <result column="version" property="version" />
+  </resultMap>
+  <!-- 通用查询结果列 -->
+  <sql id="Base_Column_List">
+        pid, rid, version
+    </sql>
+  <!-- 根据角色ID查询-->
+  <select id="selectIds" resultType="java.lang.Integer">
+    SELECT pid from role_permission where rid =  #{id,jdbcType=BIGINT}
+  </select>
+  <!-- 根据角色ID删除-->
+  <delete id="deleteByRid">
+    delete from role_permission where rid =  #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByPid">
+    delete from role_permission where pid =  #{pid,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="addRolePermission" parameterType="com.example.offer.entity.RolePermission" >
+    insert into role_permission
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="rid != null" >
+        rid,
+      </if>
+      <if test="pid != null" >
+        pid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="rid != null" >
+        #{rid,jdbcType=BIGINT},
+      </if>
+      <if test="pid != null" >
+        #{pid,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+</mapper>

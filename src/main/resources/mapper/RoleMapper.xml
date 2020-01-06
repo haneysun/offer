@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.offer.dao.RoleMapper" >
+  <resultMap id="BaseResultMap" type="com.example.offer.entity.Role" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="roleids" property="roleids" jdbcType="VARCHAR" />
+    <result column="version" property="version" />
+  </resultMap>
+
+  <resultMap id="findRoleAndPermission_resultMap" extends="BaseResultMap" type="com.example.offer.entity.Role" >
+    <collection property="permissions" javaType="com.example.offer.entity.Permission">
+      <id column="id" property="id" jdbcType="BIGINT" />
+      <result column="name" property="name" jdbcType="VARCHAR" />
+      <result column="url" property="url" jdbcType="VARCHAR" />
+    </collection>
+  </resultMap>
+
+  <sql id="Base_Column">
+        id, name, type, roleids, version
+  </sql>
+  <sql id="Base_Column_List" >
+    id, name, type
+  </sql>
+
+  <sql id="limit_sql">
+    <if test="page_sql != null and page_sql != ''">
+      ${page_sql}
+    </if>
+  </sql>
+
+  <sql id="where_all">
+    <where>
+      <if test="findContent != null and findContent !='' " >
+        and (
+        LOWER(name) like '%'||#{findContent}||'%' or
+        LOWER(type) like '%'||#{findContent}||'%'
+        )
+      </if>
+    </where>
+  </sql>
+
+
+  <select id="findRoleByUserId" resultType="java.lang.String">
+    select r.type from role r,`user` ur where ur.bumen = r.id and ur.id = #{id}
+  </select>
+
+  <!-- 普通的分页查询 -->
+  <select id="findAll" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from role
+    <include refid="where_all"/>
+    <include refid="limit_sql" />
+  </select>
+  <select id="findCount" resultMap="BaseResultMap" >
+    select count(id) from  role
+    <include refid="where_all" />
+  </select>
+  <insert id="insertRole"  parameterType="com.example.offer.mv.RoleView">
+    INSERT INTO role (name,type,roleids)VALUES
+    (#{name,jdbcType=VARCHAR},#{type,jdbcType=VARCHAR},#{roleids,jdbcType=VARCHAR})
+  </insert>
+  <!-- 权限分配的分页查询 -->
+  <select id="findRoleAndPermission" resultType="com.example.offer.mv.RoleRelatePermission"  parameterType="java.lang.String">
+    select r.id,r.type,r.name,GROUP_CONCAT(p.name) permissionNames,GROUP_CONCAT(p.id) permissionIds from
+    role r
+    left join role_permission rp on rp.rid = r.id
+    left join permission p on p.id = rp.pid
+    <where>
+      <if test="_parameter != null and _parameter !='' " >
+        and (
+        LOWER(r.name) like '%'||#{_parameter}||'%' or
+        LOWER(r.type) like '%'||#{_parameter}||'%'
+        )
+      </if>
+    </where>
+    group by r.id,r.type,r.name
+  </select>
+
+  <select id="getRolesAndCheckByUser" resultType="com.example.offer.mv.RoleAndCheck">
+    select ur.id,ur.name,ur.type,ifnull(uu.id,0)marker,uu.id userId from role ur
+    left join user_role uur on uur.rid = ur.id
+    left join (select id from `user` where id =#{id,jdbcType=BIGINT}) uu on uu.id = uur.uid
+    group by ur.id
+  </select>
+
+
+  <!-- 角色的分页查询 -->
+  <select id="findRoles" resultType="com.example.offer.entity.Role" parameterType="java.lang.String">
+    select
+    <include refid="Base_Column_List" />
+    from role
+    <where>
+      <if test="_parameter != null and _parameter !='' " >
+        and (
+        LOWER(name) like '%'||#{_parameter}||'%' or
+        LOWER(type) like '%'||#{_parameter}||'%'
+        )
+      </if>
+    </where>
+  </select>
+  <delete id="deleteRoleById" parameterType="java.lang.Long" >
+    delete from role
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+
+  <resultMap type="java.util.Map" id="menuAndUrlNamesMap">
+    <result column="type" property="type"  />
+    <result column="names" property="names"  />
+    <result column="roleids" property="roleids"  />
+    <result column="name" property="name"  />
+    <result column="id" property="id"  />
+  </resultMap>
+  <select id="getMenusAndUrlPermissionsByRoleId" resultMap="menuAndUrlNamesMap">
+    select p.type ,GROUP_CONCAT(p.name) "names" from role r
+    left join role_permission rp on r.id=rp.rid
+    left join  permission p on rp.pid=p.id
+    where r.id = #{id,jdbcType=BIGINT}
+    group by p.type
+  </select>
+
+  <select id="queryRoleORBname" parameterType="com.example.offer.mv.RoleView" resultType="java.lang.Integer">
+    SELECT COUNT(*) FROM  role WHERE name=#{name}
+  </select>
+
+  <select id="queryRoleAccordingId" parameterType="com.example.offer.entity.Role" resultMap="menuAndUrlNamesMap">
+    SELECT * FROM role where id = #{roleids}
+  </select>
+
+  <update id="updateRole" parameterType="com.example.offer.mv.RoleView">
+    update role set name=#{name},type=#{type},roleids=#{roleids} WHERE id=#{roleid}
+  </update>
+
+  <select id="findRoleByBumenId" resultType="java.lang.String">
+    select r.type from operadm.role r where r.id= #{id,jdbcType=BIGINT}
+  </select>
+</mapper>

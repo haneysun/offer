@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.offer.dao.PermissionMapper" >
+  <resultMap id="BaseResultMap" type="com.example.offer.entity.Permission" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="serial_no" property="serialNo" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="pid" property="pid" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="english_name" property="englishName" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="LONGVARCHAR" />
+      <result column="version" property="version" />
+  </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, url, name, serial_no, type, pid, code, english_name, version
+    </sql>
+
+  <sql id="QUERY_WHERE">
+    <if test="name!= null and name!= ''">
+      AND  p.name =  #{name}
+    </if>
+  </sql>
+  <!-- 根据用ID查询permission -->
+  <select id="findPermissionByUserId" resultType="String">
+    select p.url from permission p , role_permission rp, `user` ur
+    where ur.id =#{id,jdbcType=BIGINT}  and p.id = rp.pid and rp.rid = ur.bumen and p.url is not null
+  </select>
+  <select id="findAllMenuPermission" resultMap="BaseResultMap">
+    select p.name,p.english_name,p.id,p.pid,p.serial_no from permission p where p.url is null order by p.id ASC
+  </select>
+  <select id="findMenuPermissionByUserId" resultMap="BaseResultMap">
+        SELECT
+          p. NAME,
+          p.english_name,
+          p.id,
+          p.pid,
+          p.serial_no
+      FROM
+          (
+              SELECT
+                  pe.id,
+                  pp.url,
+                  pp.english_name,
+                  pp.pid,
+                  pp.serial_no,
+                  pp.`name`
+              FROM
+                  permission pp,
+                  permission pe
+              WHERE
+                  pp.pid != ''
+              AND CONCAT(',', pp.id, ',') = pe.pid
+          ) p,
+          role_permission rp,
+          `user` ur
+      WHERE
+          ur.id = #{id,jdbcType=BIGINT}
+      AND p.id = rp.pid
+      AND rp.rid = ur.bumen
+      AND p.url IS NULL
+      GROUP BY
+          p.english_name
+      ORDER BY
+          p.id ASC
+  </select>
+  <select id="getPermissions" parameterType="com.example.offer.entity.Permission" resultMap="BaseResultMap">
+    select * from  permission as p
+    WHERE 1=1
+    <include refid="QUERY_WHERE" />
+    order by p.id ASC
+  </select>
+  <insert id="insertPermission" parameterType="com.example.offer.entity.Permission">
+    INSERT INTO permission (name,english_name,url,pid)VALUES
+    (#{name,jdbcType=VARCHAR},#{englishName,jdbcType=VARCHAR},#{url,jdbcType=VARCHAR},#{pid,jdbcType=VARCHAR})
+  </insert>
+
+  <select id="getAllPermissionsRole" resultType="com.example.offer.mv.PermissionAndCheck">
+    select up.id,rp.id roleId,up.name,up.english_name englishName,up.url,
+    rp.id as marker,up.pid
+    from operadm.permission up left join
+    (select urp.PID,rl.id from operadm.role_permission urp inner join role rl on urp.RID=rl.id and rl.id=#{roleId,jdbcType=BIGINT}) rp
+    on up.ID =rp.PID
+    WHERE up.pid =','||#{pid}||','
+    order by up.id ASC
+  </select>
+  <select id="getPermissionsRole" resultType="com.example.offer.mv.PermissionAndCheck">
+    select up.id,rp.id roleId,up.name,up.english_name englishName,up.url,
+    (case when rp.id=#{roleId,jdbcType=BIGINT} then rp.id else 0 end) as marker,up.pid
+    from operadm.permission up left join
+    (select urp.PID,rl.id from operadm.role_permission urp inner join role rl on urp.RID=rl.id and rl.id=#{roleId,jdbcType=BIGINT}) rp
+    on up.ID =rp.PID
+    WHERE up.pid =','||#{pid}||','
+    order by up.id ASC
+  </select>
+  <select id="getPermissionsAndCheckByRole" resultType="com.example.offer.mv.PermissionAndCheck">
+    select up.id,rp.id roleId,up.name,up.english_name englishName,up.url,
+    (case when rp.id=#{roleId,jdbcType=BIGINT} then rp.id else 0 end) as marker,up.pid
+    from permission up left join
+    (select urp.PID,rl.id from role_permission urp inner join role rl on urp.RID=rl.id and rl.id=#{roleId,jdbcType=BIGINT}) rp
+    on up.ID =rp.PID order by up.id ASC
+  </select>
+  <delete id="deletePermissionById" parameterType="java.lang.Long">
+    delete from permission
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+  <select id="getAllPermission" resultMap="BaseResultMap">
+    select  * from permission order by id ASC
+  </select>
+
+  <select id="getPermissionByUrl" resultMap="BaseResultMap">
+    select  * from permission where url=#{url,jdbcType=VARCHAR}
+  </select>
+  <select id="getPermissionById" resultMap="BaseResultMap">
+    select  * from permission where id=#{id,jdbcType=BIGINT}
+  </select>
+  <select id="updatePermission" parameterType="com.example.offer.entity.Permission">
+    update permission set pid =#{pid} where url=#{url}
+  </select>
+  <select id="getChidPermissions" resultMap="BaseResultMap">
+    select * from permission where pid  like CONCAT("%",#{id,jdbcType=VARCHAR},"%")
+  </select>
+
+
+
+</mapper>
