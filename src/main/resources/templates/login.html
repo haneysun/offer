@@ -1,10 +1,8 @@
 ﻿<!DOCTYPE html>
-<html>
-<head>
 <meta charset="utf-8"/>
 <title>后台登录</title>
 <meta name="author" content="DeathGhost" />
-<link rel="stylesheet" type="text/css" href="static/css/style.css" />
+<link rel="stylesheet" type="text/css" href="/static/css/style.css" />
 <style>
 body{height:100%;background:#70C282;overflow:hidden;}
 canvas{z-index:-1;position:absolute;}
@@ -12,6 +10,8 @@ canvas{z-index:-1;position:absolute;}
 <script src="static/js/jquery.js"></script>
 <script src="static/js/verificationNumbers.js"></script>
 <script src="static/js/Particleground.js"></script>
+ <script src="static/js/vue.min.js"></script>
+<script src="static/js/axios.js"></script>
 <script>
 $(document).ready(function() {
 
@@ -23,23 +23,23 @@ $(document).ready(function() {
   //验证码
   createCode();
   //测试提交，对接程序删除即可
-  $(".submit_btn").click(function(){
-	  location.href="index.html";
-	  });
+  /*$(".submit_btn").click(function(){
+	  location.href="/get";
+	  });*/
 });
 </script>
 </head>
 <body>
-<dl class="admin_login">
+<dl class="admin_login" id="app">
  <dt>
   <strong>淡然面对生活</strong>
   <em>心灵常常因为细腻而伟大</em>
  </dt>
  <dd class="user_icon">
-  <input type="text" placeholder="账号" class="login_txtbx"/>
+  <input type="text" v-model="UserLogin.loginname" v-on:keydown="content" placeholder="账号" class="login_txtbx"/>
  </dd>
  <dd class="pwd_icon">
-  <input type="password" placeholder="密码" class="login_txtbx"/>
+  <input type="password" v-model="UserLogin.loginpass" v-on:keydown="content" placeholder="密码" class="login_txtbx"/>
  </dd>
  <dd class="val_icon">
   <div class="checkcode">
@@ -49,7 +49,7 @@ $(document).ready(function() {
   <input type="button" value="验证码核验" class="ver_btn" onClick="validate();">
  </dd>
  <dd>
-  <input type="button" value="立即登陆" class="submit_btn"/>
+  <input type="button" v-on:click="login()" value="立即登陆" class="submit_btn"/>
  </dd>
  <dd>
   <p>© 2015-2016 DeathGhost 版权所有</p>
@@ -58,3 +58,35 @@ $(document).ready(function() {
 </dl>
 </body>
 </html>
+<script>
+    var vm = new  Vue({
+        el: '#app',
+        data() {
+            return {
+                UserLogin: {   //表单对象
+                    loginname: 'admin',
+                    loginpass: '123456'
+                },
+                errorInfo: {
+                    text: '登陆失败,请重试',
+                    isShowError: false //显示错误提示
+                }
+
+            }
+        },
+        methods: {
+            login() {
+                axios.post("/user/login",this.UserLogin)
+                    .then(function (response) {
+                        sessionStorage.setItem("userStr",JSON.stringify(response.data.data.userStr));
+                        window.location.href="main";
+                    })
+            },
+            content:function(e) {
+                if (e.keyCode == 13){
+                    this.login();
+                }
+            }
+        }
+    })
+</script>

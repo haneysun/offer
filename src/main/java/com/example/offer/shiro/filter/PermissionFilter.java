@@ -52,7 +52,7 @@ public class PermissionFilter extends AccessControlFilter {
         if (uri != null && (subject.hasRole(ProjectConstant.administrator) || subject.isPermitted(uri))) {
             return Boolean.TRUE;
         }
-        return Boolean.TRUE;
+        return Boolean.FALSE;
     }
 
     /**
@@ -78,7 +78,7 @@ public class PermissionFilter extends AccessControlFilter {
         httpServletResponse.setCharacterEncoding("UTF-8");
         httpServletResponse.setContentType("application/json; charset=utf-8");
         httpServletResponse.getWriter().write(responseJson);
-        return Boolean.TRUE;
+        return Boolean.FALSE;
     }
 
 }

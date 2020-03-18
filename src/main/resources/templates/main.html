@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>任务管理系统</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="stylesheet" type="text/css" href="static/css/index.css"/>
+  <script src="static/js/vue.min.js"></script>
+  <script src="static/js/axios.js"></script>
+  <script src="static/js/index.js"></script>
+    <script src="static/js/vue-router.js"></script>
+  <style>
+    .el-header {
+      background-color: #B3C0D1;
+      color: #333;
+      line-height: 60px;
+    }
+
+    el-aside {
+      background-color: #333;
+
+
+    }
+    el-menu {
+      border-right: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+<el-container style="width: 100%; height: 10%; border: 1px solid #eee">
+  <el-header style="text-align: right; font-size: 12px">
+    <el-dropdown>
+      <!--<h1 style="margin-right: 90%">生命不息,战斗不止</h1>-->
+      <i class="el-icon-setting" style="margin-right: 15px"></i>
+      <el-dropdown-menu slot="dropdown">
+        <el-dropdown-item>查看</el-dropdown-item>
+        <el-dropdown-item>新增</el-dropdown-item>
+        <el-dropdown-item>删除</el-dropdown-item>
+      </el-dropdown-menu>
+    </el-dropdown>
+    <span>王小虎</span>
+  </el-header>
+<el-container style="height: 100%; border: 1px solid #eee">
+  <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+    <!-- 侧边栏菜单区域 -->
+    <el-menu unique-opened :router="true">
+      <!--&lt;!&ndash; 一级菜单 &ndash;&gt;
+      <el-submenu index="1">
+        &lt;!&ndash; 一级菜单的模板区域 &ndash;&gt;
+        <template slot="title">
+          &lt;!&ndash; 一级菜单图标 &ndash;&gt;
+          <i class="el-icon-message"></i>
+          &lt;!&ndash; 一级菜单文本 &ndash;&gt;
+          导航一
+        </template>
+        &lt;!&ndash; 二级菜单 &ndash;&gt;
+        <el-menu-item index="1-1">
+          <template slot="title">
+              &lt;!&ndash; 二级菜单图标 &ndash;&gt;
+              <i class="el-icon-message"></i>
+              &lt;!&ndash; 二级菜单文本 &ndash;&gt;
+              选项1
+          </template>
+        </el-menu-item>
+        <el-menu-item index="1-2">
+          <template slot="title">
+            &lt;!&ndash; 二级菜单图标 &ndash;&gt;
+            <i class="el-icon-message"></i>
+            &lt;!&ndash; 二级菜单文本 &ndash;&gt;
+            选项2
+          </template>
+        </el-menu-item>
+      </el-submenu>
+
+      <el-submenu index="2">
+        <template slot="title">
+          &lt;!&ndash; 一级菜单图标 &ndash;&gt;
+          <i class="el-icon-message"></i>
+          &lt;!&ndash; 一级菜单文本 &ndash;&gt;
+          导航二
+        </template>
+        <el-menu-item index="1-1">
+          <template slot="title">
+            &lt;!&ndash; 二级菜单图标 &ndash;&gt;
+            <i class="el-icon-message"></i>
+            &lt;!&ndash; 二级菜单文本 &ndash;&gt;
+            选项1
+          </template>
+        </el-menu-item>
+        <el-menu-item index="1-2">
+          <template slot="title">
+            &lt;!&ndash; 二级菜单图标 &ndash;&gt;
+            <i class="el-icon-message"></i>
+            &lt;!&ndash; 二级菜单文本 &ndash;&gt;
+            选项2
+          </template>
+        </el-menu-item>
+      </el-submenu>
+      <el-submenu index="3">
+        <template slot="title">
+          &lt;!&ndash; 一级菜单图标 &ndash;&gt;
+          <i class="el-icon-message"></i>
+          &lt;!&ndash; 一级菜单文本 &ndash;&gt;
+          导航三
+        </template>
+        <el-menu-item index="1-1">
+          <template slot="title">
+            &lt;!&ndash; 二级菜单图标 &ndash;&gt;
+            <i class="el-icon-message"></i>
+            &lt;!&ndash; 二级菜单文本 &ndash;&gt;
+            选项1
+          </template>
+        </el-menu-item>
+        <el-menu-item index="1-2">
+          <template slot="title">
+            &lt;!&ndash; 二级菜单图标 &ndash;&gt;
+            <i class="el-icon-message"></i>
+            &lt;!&ndash; 二级菜单文本 &ndash;&gt;
+            选项2
+          </template>
+        </el-menu-item>
+      </el-submenu>-->
+
+      <el-submenu :index="item.url + ''" v-for="item in menuList" :key="item.id">
+        <template slot="title">
+          <!-- 一级菜单图标 -->
+          <i :class="item.icon"></i>
+          <!-- 一级菜单文本 -->
+          <span>{{item.name}}</span>
+        </template>
+        <!-- 二级菜单 -->
+        <el-menu-item :index="subItem.url + ''" v-for="subItem in item.children">
+          <template slot="title">
+            <!-- 二级菜单图标 -->
+            <i :class="subItem.icon"></i>
+            <!-- 二级菜单文本 -->
+            <span>{{subItem.name}}</span>
+          </template>
+        </el-menu-item>
+      </el-submenu>
+
+    </el-menu>
+  </el-aside>
+
+  <el-container>
+
+    <el-main>
+      <!--<el-table :data="tableData">
+        <el-table-column prop="date" label="日期" width="140">
+        </el-table-column>
+        <el-table-column prop="name" label="姓名" width="120">
+        </el-table-column>
+        <el-table-column prop="address" label="地址">
+        </el-table-column>
+      </el-table>-->
+      <router-view></router-view>
+    </el-main>
+  </el-container>
+</el-container>
+</el-container>
+</div>
+
+</body>
+</html>
+<script>
+    Vue.use(VueRouter);
+    const router = new VueRouter({
+        routes: [
+            // 动态路径参数 以冒号开头
+            { path: 'get', component: 'logout' }
+        ]
+    })
+    var vm = new Vue({
+        el:"#app",
+        router,
+        data:function() {
+            const item = {
+                date: '2016-05-02',
+                name: '王小虎',
+                address: '上海市普陀区金沙江路 1518 弄'
+            };
+            return {
+                menuList:[],
+                tableData: Array(20).fill(item)
+            }
+        },
+        methods:{
+            getMenuList:function () {
+                var user = JSON.parse(sessionStorage.getItem("userStr"));
+                console.log(user.id);
+                axios.post("/user/getUser?id="+user.id)
+                    .then((result) => {
+                        this.menuList = result.data.data;
+                    })
+            },
+            logout(){
+                window.sessionStorage.clear();
+                this.$router.push("/get")
+            }
+        },
+        created(){
+            this.getMenuList()
+        }
+    });
+</script>

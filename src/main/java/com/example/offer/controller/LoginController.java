@@ -4,6 +4,7 @@ import com.example.offer.core.ErrorCode;
 import com.example.offer.entity.Permission;
 import com.example.offer.entity.User;
 import com.example.offer.mv.EUDataGridResult;
+import com.example.offer.mv.PermissionTree;
 import com.example.offer.mv.ResponseView;
 import com.example.offer.mv.UserLogin;
 import com.example.offer.service.ILoginService;
@@ -50,12 +51,12 @@ public class LoginController extends BaseController {
      * @Param: [userLogin, session]
      * 登陆
      * @return: com.bjst.htlh.admin.mv.ResponseView
-     * @Author: luoxiaowen
-     * @Date: 2018/10/10
+     * @Author: MaHC
+     * @Date: 2020/1/10
      * @Time: 17:56
      */
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public ResponseView Login(@ModelAttribute("UserLogin") UserLogin userLogin, HttpSession session){
+    public ResponseView Login(@RequestBody UserLogin userLogin, HttpSession session){
 
         User login = new User();
         login.setLoginPass(userLogin.getLoginpass());
@@ -95,10 +96,8 @@ public class LoginController extends BaseController {
         login.setLoginPass(null);
         login.setToken("12323");
         login.setBumen(user.getBumen());
-        HashMap<String, List<Object>> hashMap = new HashMap<String, List<Object>>(16);
-        List<Object> memberList=new ArrayList<Object>();
-        memberList.add(login);
-        hashMap.put("userStr",memberList);
+        HashMap<String, Object> hashMap = new HashMap<String, Object>(16);
+        hashMap.put("userStr",login);
         log.info("登录成功");
         return ResponseView.success(hashMap,"登陆成功");
     }
@@ -107,8 +106,8 @@ public class LoginController extends BaseController {
      * @Param: []
      * 获取登陆用户信息
      * @return: com.bjst.htlh.admin.mv.ResponseView
-     * @Author: luoxiaowen
-     * @Date: 2018/10/18
+     * @Author: MaHC
+     * @Date: 2020/1/10
      * @Time: 16:29
      */
     @RequestMapping(value = "getUser")
@@ -116,62 +115,9 @@ public class LoginController extends BaseController {
         if (id==null){
             return ResponseView.errorsInfo(ErrorCode.unlogin,"请先登陆");
         }
-        Map<String, Object> hashMap = new HashMap<>(16);
-        User user = new User();
-        user.setId(id);
-        User token = iLoginService.findAction(user);
-        token.setToken("12323");
-        hashMap.put("id",token.getId());
-        hashMap.put("bumen",token.getBumen());
-        hashMap.put("loginName",token.getLoginName());
-        hashMap.put("tel",token.getTel());
-        hashMap.put("name",token.getName());
-        hashMap.put("token",token.getToken());
         Map<String, Boolean> map = new HashMap<>(16);
-        map.put("/index/readme",true);
-        map.put("/index/personalInfo",true);
-        map.put("/example/tableList",true);
-        map.put("/agent/addAgent",true);
-        map.put("/systemSet/getPermissionsAndCheckByRole",true);
-        map.put("/agent/changeAgent",true);
-        map.put("/agent/agentInfo",true);
-        map.put("/agent/name",true);
-        map.put("/agent/allAgent",true);
-        map.put("/agentMoney/moneyRun",true);
-        map.put("/agentMoney/moneyPay",true);
-        map.put("/agentMoney/moneyRecord",true);
-        map.put("/user/updateUserPassword",true);
-        map.put("/user/addUser",true);
-        map.put("/customer/customChange",true);
-        map.put("/customer/customStatus",true);
-        map.put("/deal/dealOrder",true);
-        map.put("/deal/dealRun",true);
-        map.put("/dsystem/systemRole",true);
-        map.put("/dsystem/systemWork",true);
-        map.put("/movie/newMovie",true);
-        map.put("/movie/movieSearch",true);
-        map.put("/errorpage/401",false);
-        map.put("/errorpage/404",false);
-        map.put("/example/form",true);
-        map.put("/example/tinymce",true);
-        map.put("/example/mixin",true);
-        map.put("/example/31",false);
-        map.put("/studentsManage/studentAdd",true);
-        map.put("/studentsManage/studentUpdate",true);
-        map.put("/studentsManage/studentList",true);
-        map.put("/customer/customInfo",true);
-        map.put("/agent/agentUser",true);
-        map.put("/Customer/Buy",true);
-        map.put("/Customer/NoShot",true);
-        map.put("/Customer/Shooting",true);
-        List<Permission> menus=iPermissionService.findMenuPermissionByUserId(token.getId());
-        for (Permission permission:menus){
-            if(StringUtils.isNotBlank(permission.getEnglishName())){
-                map.put(permission.getEnglishName(),true);
-            }
-        }
-        hashMap.put("permissions",map);
-        return ResponseView.success(hashMap);
+        List<PermissionTree> menus=iPermissionService.findMainMenuByUserId(id);
+        return ResponseView.success(menus);
     }
     /**
      * @Description: LoginController
@@ -209,8 +155,8 @@ public class LoginController extends BaseController {
      * @Param: [request, response, user]
      *判断登录名是否存在支持时调用
      * @return: com.bjst.htlh.admin.mv.ResponseView
-     * @Author: luoxiaowen
-     * @Date: 2018/10/10
+     * @Author: MaHC
+     * @Date: 2020/1/10
      * @Time: 17:57
      */
     @ResponseBody

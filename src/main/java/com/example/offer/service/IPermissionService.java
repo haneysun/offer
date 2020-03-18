@@ -19,9 +19,11 @@ import java.util.Set;
  */
 public interface IPermissionService {
 
+    List<PermissionTree> findMainMenuByUserId(Long userId);
+
     Set<String> findPermissionByUserId(Long userId);
 
-    List<Permission> findMenuPermissionByUserId(Long userId);
+    List<PermissionTree> findMenuPermissionByUserId(Long userId);
 
     PageInfo<Map<String, Object>> getPermissions(Permission permisssion);
 

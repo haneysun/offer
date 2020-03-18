@@ -10,6 +10,7 @@ import com.example.offer.mv.PermissionAndCheck;
 import com.example.offer.mv.PermissionTree;
 import com.example.offer.service.IPermissionService;
 import com.example.offer.shiro.TokenManager;
+import com.example.offer.util.RecursiveUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +40,20 @@ public class PermissionServiceImpl implements IPermissionService {
     RoleMapper roleMapper;
 
 
+    @Override
+    public List<PermissionTree> findMainMenuByUserId(Long userId) {
+        Set<String> types = roleMapper.findRoleByUserId(userId);
+        List<PermissionTree> permisssionList = new ArrayList<>();
+        if (types.contains("admin")) {
+            permisssionList = permissionMapper.findAllMenu();
+            return RecursiveUtils.buildByRecursive(permisssionList);
+        } else {
+            permisssionList = permissionMapper.findMenuPermissionByUserId(userId);
+            return RecursiveUtils.buildByRecursive(permisssionList);
+        }
+    }
+
+
     public Set<String> findPermissionByUserId(Long userId) {
         Set<String> permissionByUserId = permissionMapper.findPermissionByUserId(userId);
         Set<String> urlList=new HashSet<String>();
@@ -55,9 +70,9 @@ public class PermissionServiceImpl implements IPermissionService {
      * @param userId
      * @return
      */
-    public List<Permission> findMenuPermissionByUserId(Long userId) {
+    public List<PermissionTree> findMenuPermissionByUserId(Long userId) {
         Set<String> types = roleMapper.findRoleByUserId(userId);
-        List<Permission> permisssionList;
+        List<PermissionTree> permisssionList;
         if (types.contains("admin")) {
             permisssionList = permissionMapper.findAllMenuPermission();
         } else {

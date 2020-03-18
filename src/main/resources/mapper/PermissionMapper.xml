@@ -32,10 +32,11 @@
     where ur.id =#{id,jdbcType=BIGINT}  and p.id = rp.pid and rp.rid = ur.bumen and p.url is not null
   </select>
   <select id="findAllMenuPermission" resultMap="BaseResultMap">
-    select p.name,p.english_name,p.id,p.pid,p.serial_no from permission p where p.url is null order by p.id ASC
+    select p.id,p.name,p.english_name,p.id,p.pid,p.serial_no from permission p where p.url is null order by p.id ASC
   </select>
   <select id="findMenuPermissionByUserId" resultMap="BaseResultMap">
         SELECT
+          p.id,
           p. NAME,
           p.english_name,
           p.id,
@@ -126,6 +127,10 @@
   <select id="getChidPermissions" resultMap="BaseResultMap">
     select * from permission where pid  like CONCAT("%",#{id,jdbcType=VARCHAR},"%")
   </select>
+
+    <select id="findAllMenu" resultType="com.example.offer.mv.PermissionTree">
+        select * from permission
+    </select>
 
 
 

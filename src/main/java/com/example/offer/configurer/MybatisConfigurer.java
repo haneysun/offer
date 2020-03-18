@@ -18,8 +18,8 @@ import java.util.Properties;
 
 /**
  * Mybatis & Mapper & PageHelper 配置
- * create by 春春
- *  2019/4/26
+ * create by MaHC
+ *  2020/1/10
  */
 //@Configuration
 public class MybatisConfigurer {

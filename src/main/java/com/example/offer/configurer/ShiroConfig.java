@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * shiro配置类
  * create by 春春
- * 2019/4/26
+ * 2020/1/10
  */
 @Configuration
 public class ShiroConfig {
@@ -53,17 +53,18 @@ public class ShiroConfig {
     public PermissionFilter permissionFilter(){
         return new PermissionFilter();
     }
+
     @Bean
     public ShiroFilterFactoryBean shiroFilter() {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager());
         // 没有登陆的用户只能访问登陆页面
-        shiroFilterFactoryBean.setLoginUrl("/login");
+        shiroFilterFactoryBean.setLoginUrl("/get");
 
         // 登录成功后要跳转的链接
-        shiroFilterFactoryBean.setSuccessUrl("/index/personalInfo");
+        //shiroFilterFactoryBean.setSuccessUrl("/index/personalInfo");
         // 未授权界面; ----这个配置了没卵用，具体原因想深入了解的可以自行百度
-        shiroFilterFactoryBean.setUnauthorizedUrl("/login/login.html");
+        shiroFilterFactoryBean.setUnauthorizedUrl("/get");
 
         //自定义拦截器
         Map<String, Filter> filtersMap = new HashMap<>();
@@ -71,14 +72,12 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setFilters(filtersMap);
         // 权限控制map.
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
-        filterChainDefinitionMap.put("/user/login", "anon");
-        filterChainDefinitionMap.put("/name/get", "anon");
-        filterChainDefinitionMap.put("/user/logout", "logout");
-        filterChainDefinitionMap.put("/user/queryLoginname", "anon");
-        filterChainDefinitionMap.put("/static/**", "anon");
-        filterChainDefinitionMap.put("/css/**", "anon");
-        filterChainDefinitionMap.put("/js/**", "anon");
+        filterChainDefinitionMap.put("/get", "anon");
         filterChainDefinitionMap.put("/user/getUser", "anon");
+        filterChainDefinitionMap.put("/static/**", "anon");
+        /*filterChainDefinitionMap.put("/images/**", "anon");
+        filterChainDefinitionMap.put("/css/**", "anon");
+        filterChainDefinitionMap.put("/js/**", "anon");*/
         //主要这行代码必须放在所有权限设置的最后，不然会导致所有 url 都被拦截
         filterChainDefinitionMap.put("/**", "authc");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);

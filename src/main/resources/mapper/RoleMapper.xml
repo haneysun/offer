@@ -46,7 +46,7 @@
 
 
   <select id="findRoleByUserId" resultType="java.lang.String">
-    select r.type from role r,`user` ur where ur.bumen = r.id and ur.id = #{id}
+    select r.`name` from role r,`user` ur where ur.bumen = r.id and ur.id = #{id}
   </select>
 
   <!-- 普通的分页查询 -->

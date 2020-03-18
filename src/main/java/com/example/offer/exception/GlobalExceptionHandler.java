@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
         if(!HttpUtil.isAjaxRequest(request)){
             logger.error("500异常",e.getCause(), e);
             // 跳转页面请求重定向到500页面
-            String redirectUri = request.getContextPath() + "/500";
+            String redirectUri = request.getContextPath() + "/default500";
             String message = e.getMessage();
             redirectUri += "?message=" + URLEncoder.encode(message == null ? "" : message, "UTF-8");
             response.sendRedirect(redirectUri);
@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
         if(!HttpUtil.isAjaxRequest(request)){
             logger.error("500异常",bex.getCause(), bex);
             // 跳转页面请求重定向到500页面
-            String redirectUri = request.getContextPath() + "/500";
+            String redirectUri = request.getContextPath() + "/default500";
             String message = bex.getErrMsg();
             redirectUri += "?message=" + URLEncoder.encode(message == null ? "" : message, "UTF-8");
             response.sendRedirect(redirectUri);

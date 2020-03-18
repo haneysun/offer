@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * MybatisPlus 配置文件
  * </p>
  *
- * @author 孔邹祥
- * @date 2019年1月2日
+ * @author MaHC
+ * @date 2020年1月10日
  */
 @EnableTransactionManagement
 @Configuration

@@ -3,6 +3,7 @@ package com.example.offer.dao;
 
 import com.example.offer.entity.Permission;
 import com.example.offer.mv.PermissionAndCheck;
+import com.example.offer.mv.PermissionTree;
 import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
 
@@ -21,8 +22,8 @@ public interface PermissionMapper extends Mapper<Permission> {
      */
     Set<String> findPermissionByUserId(Long id);
 
-    List<Permission> findMenuPermissionByUserId(Long id);
-    List<Permission> findAllMenuPermission();
+    List<PermissionTree> findMenuPermissionByUserId(Long id);
+    List<PermissionTree> findAllMenuPermission();
     /**
      *
      * 查询权限
@@ -51,4 +52,9 @@ public interface PermissionMapper extends Mapper<Permission> {
     public Permission getPermissionById(Long id);
     public void updatePermission(Permission permission);
     public List<Permission> getChidPermissions(String id);
+
+
+
+    List<PermissionTree> findAllMenu();
+
 }

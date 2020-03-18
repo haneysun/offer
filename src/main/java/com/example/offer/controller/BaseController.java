@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.InitBinder;
 import java.beans.PropertyEditorSupport;
 
 /**
- * create by 春春
- * 2019/4/26
+ * create by MaHC
+ * 2020/1/10
  */
 public abstract class BaseController {
     protected Logger logger = LogManager.getLogger(this.getClass().getSimpleName());

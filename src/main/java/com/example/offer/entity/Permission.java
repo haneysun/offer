@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
  * 权限配置表
  * </p>
  *
- * @author 孔邹祥
+ * @author MaHC
  * @since 2019-04-26
  */
 @Data
@@ -63,6 +63,12 @@ public class Permission extends EUDataGridRequest implements Serializable  {
      */
     @TableField("code")
     private String code;
+
+    /**
+     * 权限图标
+     */
+    @TableField("icon")
+    private String icon;
 
     /**
      * vue路由

@@ -87,7 +87,7 @@ public class PermissionRelateRoleController extends BaseController {
         map.put("/studentsManage/studentAdd",true);
         map.put("/studentsManage/studentUpdate",true);
         map.put("/studentsManage/studentList",true);
-        List<Permission> menus=iPermissionService.findMenuPermissionByUserId(userId);
+        List<PermissionTree> menus=iPermissionService.findMenuPermissionByUserId(userId);
         for (Permission permission:menus){
             if(StringUtils.isNotBlank(permission.getEnglishName())) map.put(permission.getEnglishName(),true);
         }
