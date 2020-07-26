@@ -1,9 +1,16 @@
 package com.example.offer;
 
+import com.example.offer.configurer.WebSocket;
 import lombok.extern.slf4j.Slf4j;
+import org.java_websocket.client.WebSocketClient;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
 @Slf4j
 @SpringBootApplication
 @MapperScan("com.example.offer.dao")
@@ -52,6 +59,18 @@ public class OfferApplication {
                 " *            9Bi,:,,,,......                        ..r91;;;;;iirrsss1ss1111\n" +
                 " */\n");
         log.info("启动结束");
+    }
+
+    @Bean
+    public WebSocketClient webSocketClient() {
+        try {
+            WebSocket webSocketClient = new WebSocket(new URI("ws://www.okex.com/api/spot/candle60s"));
+            webSocketClient.connect();
+            return webSocketClient;
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
